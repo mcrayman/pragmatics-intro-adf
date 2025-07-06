@@ -1,5 +1,5 @@
 {
-	"name": "DestinationDataset_bd8",
+	"name": "az_adls_introtoadfmm_address_csv",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "az_adls_introtoadfmm",

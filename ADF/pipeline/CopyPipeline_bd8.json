@@ -52,13 +52,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SourceDataset_bd8",
+						"referenceName": "az_sqldb_AWLT_Address",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DestinationDataset_bd8",
+						"referenceName": "az_adls_introtoadfmm_address_csv",
 						"type": "DatasetReference"
 					}
 				]

@@ -1,5 +1,5 @@
 {
-	"name": "SourceDataset_bd8",
+	"name": "az_sqldb_AWLT_Address",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "az_sqldb_AdventureWorksLT",
