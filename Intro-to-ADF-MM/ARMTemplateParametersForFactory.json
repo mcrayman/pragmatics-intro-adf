@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "Intro-to-ADF-MM"
+		},
+		"az_adls_introtoadfmm_accountKey": {
+			"value": ""
+		},
+		"az_sqldb_AdventureWorksLT_password": {
+			"value": ""
+		},
+		"az_adls_introtoadfmm_properties_typeProperties_url": {
+			"value": "https://introtoadfall.dfs.core.windows.net/"
+		},
+		"az_sqldb_AdventureWorksLT_properties_typeProperties_server": {
+			"value": "introtoadf-mm.database.windows.net"
+		},
+		"az_sqldb_AdventureWorksLT_properties_typeProperties_database": {
+			"value": "AdventureWorksLT"
+		},
+		"az_sqldb_AdventureWorksLT_properties_typeProperties_userName": {
+			"value": "adminuser"
+		}
+	}
+}
