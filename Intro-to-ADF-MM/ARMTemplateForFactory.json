@@ -92,14 +92,14 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "SourceDataset_bd8",
+								"referenceName": "az_sqldb_AWLT_Address",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "DestinationDataset_bd8",
+								"referenceName": "az_adls_introtoadfmm_address_csv",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -112,12 +112,12 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SourceDataset_bd8')]",
-				"[concat(variables('factoryId'), '/datasets/DestinationDataset_bd8')]"
+				"[concat(variables('factoryId'), '/datasets/az_sqldb_AWLT_Address')]",
+				"[concat(variables('factoryId'), '/datasets/az_adls_introtoadfmm_address_csv')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DestinationDataset_bd8')]",
+			"name": "[concat(parameters('factoryName'), '/az_adls_introtoadfmm_address_csv')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -146,7 +146,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SourceDataset_bd8')]",
+			"name": "[concat(parameters('factoryName'), '/az_sqldb_AWLT_Address')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
