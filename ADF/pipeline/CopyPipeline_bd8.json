@@ -64,6 +64,9 @@
 				]
 			}
 		],
+		"folder": {
+			"name": "CopyData"
+		},
 		"annotations": []
 	}
 }
