@@ -522,6 +522,53 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/GetMetadata_From_Folder')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Metadata1",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "az_adls_introtoadfmm_training",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "ParquetReadSettings"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/az_adls_introtoadfmm_training')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/az_adls_introtoadfmm_address_csv')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -624,6 +671,55 @@
 					"quoteChar": "\""
 				},
 				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/az_adls_introtoadfmm')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/az_adls_introtoadfmm_training')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "az_adls_introtoadfmm",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "training"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "countryOrRegion",
+						"type": "UTF8"
+					},
+					{
+						"name": "holidayName",
+						"type": "UTF8"
+					},
+					{
+						"name": "normalizeHolidayName",
+						"type": "UTF8"
+					},
+					{
+						"name": "isPaidTimeOff",
+						"type": "BOOLEAN"
+					},
+					{
+						"name": "countryRegionCode",
+						"type": "UTF8"
+					},
+					{
+						"name": "date",
+						"type": "INT96"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/az_adls_introtoadfmm')]"
