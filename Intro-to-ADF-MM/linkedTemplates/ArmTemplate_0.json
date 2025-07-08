@@ -106,6 +106,85 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/az_adls_introtoadfmm_holiday_parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "az_adls_introtoadfmm",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Holiday.snappy.parquet",
+						"fileSystem": "training"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "countryOrRegion",
+						"type": "UTF8"
+					},
+					{
+						"name": "holidayName",
+						"type": "UTF8"
+					},
+					{
+						"name": "normalizeHolidayName",
+						"type": "UTF8"
+					},
+					{
+						"name": "isPaidTimeOff",
+						"type": "BOOLEAN"
+					},
+					{
+						"name": "countryRegionCode",
+						"type": "UTF8"
+					},
+					{
+						"name": "date",
+						"type": "INT96"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/az_adls_introtoadfmm')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/az_adls_introtoadfmm_product_csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "az_adls_introtoadfmm",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "product.csv",
+						"folderPath": "AdventureWorks",
+						"fileSystem": "training"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/az_adls_introtoadfmm')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/az_sqldb_AWLT_Address')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -160,6 +239,27 @@
 				"typeProperties": {
 					"schema": "SalesLT",
 					"table": "Address"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/az_sqldb_AdventureWorksLT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/az_sqldb_AWLT_holiday')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "az_sqldb_AdventureWorksLT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Holiday"
 				}
 			},
 			"dependsOn": [
@@ -274,35 +374,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/az_adls_introtoadfmm_product_csv')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "az_adls_introtoadfmm",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "product.csv",
-						"folderPath": "AdventureWorks",
-						"fileSystem": "training"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/az_adls_introtoadfmm')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/CopyPipeline_bd8')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -380,6 +451,77 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/az_sqldb_AWLT_Address')]",
 				"[concat(variables('factoryId'), '/datasets/az_adls_introtoadfmm_address_csv')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_From_ADLS_To_SQLDB')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "ParquetSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "ParquetReadSettings"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "az_adls_introtoadfmm_holiday_parquet",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "az_sqldb_AWLT_holiday",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/az_adls_introtoadfmm_holiday_parquet')]",
+				"[concat(variables('factoryId'), '/datasets/az_sqldb_AWLT_holiday')]"
 			]
 		},
 		{
