@@ -502,7 +502,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataset": {
-								"referenceName": "az_adls_introtoadfmm_holiday_parquet",
+								"referenceName": "az_adls_introtoadfmm_address_csv",
 								"type": "DatasetReference",
 								"parameters": {}
 							},
@@ -516,8 +516,58 @@
 								"enablePartitionDiscovery": false
 							},
 							"formatSettings": {
-								"type": "ParquetReadSettings"
+								"type": "DelimitedTextReadSettings"
 							}
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Get Metadata1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_InsertLastModifiedDate]",
+							"storedProcedureParameters": {
+								"FileName": {
+									"value": {
+										"value": "@activity('Get Metadata1').output.itemName",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"ModifiedDate": {
+									"value": {
+										"value": "@activity('Get Metadata1').output.lastModified",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"RecordInsertDate": {
+									"value": {
+										"value": "@utcNow()",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "az_sqldb_AdventureWorksLT",
+							"type": "LinkedServiceReference"
 						}
 					}
 				],
@@ -530,7 +580,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/az_adls_introtoadfmm_holiday_parquet')]"
+				"[concat(variables('factoryId'), '/datasets/az_adls_introtoadfmm_address_csv')]",
+				"[concat(variables('factoryId'), '/linkedServices/az_sqldb_AdventureWorksLT')]"
 			]
 		},
 		{
@@ -581,6 +632,82 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/az_adls_introtoadfmm_training')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/IF_Condition_Activity_Lookup_GetMetadata')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Last Modified Date",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "az_adls_introtoadfmm_address_csv",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								"itemName",
+								"lastModified"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "Get Last Execution Date",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[usp_LastLoadDate]",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "az_sqldb_AWLT_Address",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/az_adls_introtoadfmm_address_csv')]",
+				"[concat(variables('factoryId'), '/datasets/az_sqldb_AWLT_Address')]"
 			]
 		},
 		{
