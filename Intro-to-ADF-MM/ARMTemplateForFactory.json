@@ -109,6 +109,9 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"folder": {
+					"name": "CopyData"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -181,6 +184,9 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "CopyData"
 				},
 				"annotations": []
 			},
@@ -466,6 +472,9 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"folder": {
+					"name": "CopyData"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -515,6 +524,9 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"folder": {
+					"name": "GetMetadata"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -561,6 +573,9 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "GetMetadata"
 				},
 				"annotations": []
 			},
