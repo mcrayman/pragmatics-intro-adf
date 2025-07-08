@@ -1,0 +1,16 @@
+{
+	"name": "az_sqldb_AWLT_holiday",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "az_sqldb_AdventureWorksLT",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Holiday"
+		}
+	}
+}
