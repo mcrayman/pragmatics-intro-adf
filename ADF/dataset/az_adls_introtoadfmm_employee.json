@@ -1,26 +1,16 @@
 {
-	"name": "az_adls_introtoadfmm_dynamic_csv",
+	"name": "az_adls_introtoadfmm_employee",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "az_adls_introtoadfmm",
 			"type": "LinkedServiceReference"
-		},
-		"parameters": {
-			"filename": {
-				"type": "string",
-				"defaultValue": "placeholder"
-			}
 		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@concat(dataset().filename, '.csv')",
-					"type": "Expression"
-				},
-				"folderPath": "AdventureWorks",
+				"folderPath": "Employee",
 				"fileSystem": "training"
 			},
 			"columnDelimiter": ",",
