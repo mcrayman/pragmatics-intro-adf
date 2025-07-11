@@ -3,11 +3,125 @@
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
-			"sinks": [],
-			"transformations": [],
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "az_sqldb_AdventureWorksLT",
+						"type": "LinkedServiceReference"
+					},
+					"name": "SalesOrderDetail"
+				},
+				{
+					"linkedService": {
+						"referenceName": "az_adls_introtoadfmm",
+						"type": "LinkedServiceReference"
+					},
+					"name": "Product"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "az_adls_introtoadfmm",
+						"type": "LinkedServiceReference"
+					},
+					"name": "LoadProductSales"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SalesByProduct"
+				},
+				{
+					"name": "ProductRank"
+				},
+				{
+					"name": "FilterProductRank"
+				},
+				{
+					"name": "BringProductName"
+				}
+			],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          SalesOrderID as integer,",
+				"          SalesOrderDetailID as integer,",
+				"          OrderQty as short,",
+				"          ProductID as integer,",
+				"          UnitPrice as decimal(19,4),",
+				"          UnitPriceDiscount as decimal(19,4),",
+				"          LineTotal as decimal(38,6),",
+				"          rowguid as string,",
+				"          ModifiedDate as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'SalesLT',",
+				"     tableName: 'SalesOrderDetail',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> SalesOrderDetail",
+				"source(output(",
+				"          ProductID as short,",
+				"          Name as string,",
+				"          ProductNumber as string,",
+				"          Color as string,",
+				"          StandardCost as double,",
+				"          ListPrice as double,",
+				"          Size as string,",
+				"          Weight as double,",
+				"          ProductCategoryID as short,",
+				"          ProductModelID as short,",
+				"          SellStartDate as string,",
+				"          SellEndDate as string,",
+				"          DiscontinuedDate as string,",
+				"          ThumbNailPhoto as string,",
+				"          ThumbnailPhotoFileName as string,",
+				"          rowguid as string,",
+				"          ModifiedDate as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'training',",
+				"     folderPath: 'AdventureWorks',",
+				"     fileName: 'product.csv',",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> Product",
+				"SalesOrderDetail aggregate(groupBy(ProductID),",
+				"     SalesByProduct = sum(LineTotal),",
+				"          TotalProducts = count(SalesOrderID)) ~> SalesByProduct",
+				"SalesByProduct rank(desc(SalesByProduct, true),",
+				"     output(ProductRank as long)) ~> ProductRank",
+				"ProductRank filter(lesserOrEqual(ProductRank, 10)) ~> FilterProductRank",
+				"FilterProductRank, Product join(SalesByProduct@ProductID == Product@ProductID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> BringProductName",
+				"BringProductName sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     fileSystem: 'training',",
+				"     folderPath: 'AdventureWorks',",
+				"     compressionCodec: 'snappy',",
+				"     partitionFileNames:['productrank.snappy.parquet'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          ProductRank,",
+				"          Name,",
+				"          SalesByProduct,",
+				"          TotalProducts",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> LoadProductSales"
 			]
 		}
 	}
